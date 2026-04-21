@@ -1,0 +1,426 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.5">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="de"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="theme-color" content="#0f172a" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="mobile-web-app-capable" content="yes" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="apple-mobile-web-app-capable" content="yes" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;link rel="manifest" href="./manifest.json" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Katzen Trink Monitor&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>:root {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--bg: #0b1220; --panel: #111a2b; --panel2: #162238; --text: #e5eefc;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--muted: #9cb0cf; --line: rgba(255,255,255,0.12); --blue: #4f9cf9;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--green: #22c55e; --amber: #f59e0b; --red: #ef4444;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--radius: 16px; --shadow: 0 12px 30px rgba(0,0,0,0.35);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>* { box-sizing: border-box; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: Inter, system-ui, Arial, sans-serif; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>body { min-height: 100vh; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.app { max-width: 1180px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.card { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.header { padding: 18px; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>h1 { margin: 0; font-size: 1.35rem; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.sub { margin: 6px 0 0; color: var(--muted); font-size: 0.95rem; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.badges, .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.badge { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); padding: 10px 12px; border-radius: 999px; background: rgba(255,255,255,0.04); font-size: 0.92rem; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.dot { width: 10px; height: 10px; border-radius: 50%; background: #64748b; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.live { background: var(--green); box-shadow: 0 0 0 6px rgba(34,197,94,0.16); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.rec { background: var(--red); box-shadow: 0 0 0 6px rgba(239,68,68,0.16); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.grid { display: grid; grid-template-columns: 1.7fr 1fr; gap: 16px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.viewer { position: relative; background: #000; aspect-ratio: 16/9; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>video, canvas.overlay { width: 100%; height: 100%; object-fit: cover; display: block; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>canvas.overlay { position: absolute; inset: 0; pointer-events: none; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.roi-box { position: absolute; border: 2px dashed rgba(79,156,249,0.95); background: rgba(79,156,249,0.12); pointer-events: none; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.hidden { display: none !important; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.controls, .panel { padding: 16px; display: grid; gap: 14px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button { border: 0; border-radius: 12px; padding: 14px 16px; min-height: 46px; font-weight: 700; cursor: pointer; color: #fff; background: #23314a; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button.primary { background: var(--blue); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button.success { background: #15803d; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button.warn { background: #b45309; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button.danger { background: #b91c1c; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button.ghost { background: rgba(255,255,255,0.07); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button:disabled { opacity: 0.55; cursor: not-allowed; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>input[type="range"], input[type="number"], input[type="text"], input[type="password"], select, textarea {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 100%; background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>textarea { min-height: 88px; resize: vertical; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>label { color: var(--muted); font-size: 0.92rem; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.value { color: var(--text); font-weight: 700; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.row { display: grid; gap: 8px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.stat { border: 1px solid var(--line); background: rgba(255,255,255,0.04); border-radius: 14px; padding: 12px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.stat .k { color: var(--muted); font-size: 0.8rem; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.stat .v { margin-top: 6px; font-size: 1.08rem; font-weight: 800; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.help { color: var(--muted); font-size: 0.9rem; line-height: 1.45; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.clips { padding: 16px; display: grid; gap: 12px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.clip-list { display: grid; gap: 10px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.clip { display: grid; grid-template-columns: 110px 1fr auto; gap: 12px; align-items: center; border: 1px solid var(--line); background: rgba(255,255,255,0.04); border-radius: 14px; padding: 10px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.clip img { width: 110px; height: 74px; object-fit: cover; border-radius: 10px; background: #000; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.clip h3 { margin: 0 0 5px; font-size: 0.98rem; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.clip p { margin: 0; color: var(--muted); font-size: 0.88rem; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.small { padding: 10px 12px; min-height: 40px; border-radius: 10px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.footer { padding: 16px; color: var(--muted); font-size: 0.9rem; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.pill { display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--line); background: rgba(255,255,255,0.04); padding: 8px 12px; border-radius: 999px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.ok { color: #7dd3fc; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.toast { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 9999; background: rgba(12,18,30,0.96); color: var(--text); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); max-width: calc(100vw - 24px); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>@media (max-width: 900px) { .grid, .row2, .stats { grid-template-columns: 1fr; } .clip { grid-template-columns: 1fr; } .clip img { width: 100%; height: auto; aspect-ratio: 16/9; } }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1">&lt;div class="app"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;section class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="header"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h1&gt;🐱 Katzen Trink Monitor&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="sub"&gt;PWA für Redmi A2 · ROI-Bewegungserkennung · Videoaufnahme · Telegram-Alarm&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="badges"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="badge"&gt;&lt;span id="camDot" class="dot"&gt;&lt;/span&gt;&lt;span id="camStatus"&gt;Kamera aus&lt;/span&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="badge"&gt;&lt;span id="recDot" class="dot"&gt;&lt;/span&gt;&lt;span id="recStatus"&gt;Nicht am Aufnehmen&lt;/span&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="badge"&gt;&lt;span id="pwaStatus"&gt;PWA: wird geprüft…&lt;/span&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/section&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;section class="grid"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="viewer" class="viewer"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;video id="video" playsinline autoplay muted&gt;&lt;/video&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;canvas id="overlay" class="overlay"&gt;&lt;/canvas&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="roiBox" class="roi-box hidden"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="panel"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="btn-row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button id="setRoiBtn" class="warn"&gt;Trinkbereich festlegen&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button id="clearRoiBtn" class="ghost"&gt;Bereich zurücksetzen&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button id="snapshotBtn" class="ghost"&gt;Testbild speichern&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button id="installBtn" class="primary hidden"&gt;Als App installieren&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="help"&gt;Lege das Rechteck direkt über den Wassernapf. So startet die Aufnahme nur bei Bewegung an der relevanten Stelle – und der Telegram-Alarm kommt nur bei echten Treffern.&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card controls"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="btn-row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button id="startBtn" class="primary"&gt;Kamera starten&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button id="monitorBtn" class="success" disabled&gt;Überwachung starten&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button id="stopBtn" class="danger" disabled&gt;Alles stoppen&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label for="cameraSelect"&gt;Kamera&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;select id="cameraSelect"&gt;&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label&gt;Empfindlichkeit: &lt;span id="sensitivityValue" class="value"&gt;18&lt;/span&gt;&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input id="sensitivity" type="range" min="5" max="60" value="18" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label&gt;Bewegungsschwelle (Pixel): &lt;span id="motionPixelsValue" class="value"&gt;1400&lt;/span&gt;&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input id="motionPixels" type="range" min="150" max="9000" step="50" value="1400" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="row2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="row"&gt;&lt;label&gt;Nachlauf (Sek.)&lt;/label&gt;&lt;input id="postRoll" type="number" min="2" max="30" value="8" /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="row"&gt;&lt;label&gt;Max. Clip-Länge (Sek.)&lt;/label&gt;&lt;input id="clipLimit" type="number" min="5" max="120" value="25" /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="row2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="row"&gt;&lt;label&gt;Pause zwischen Clips (Sek.)&lt;/label&gt;&lt;input id="cooldown" type="number" min="0" max="60" value="12" /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="row"&gt;&lt;label&gt;Pause Telegram-Alarm (Min.)&lt;/label&gt;&lt;input id="telegramCooldown" type="number" min="0" max="240" value="10" /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="stats"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="stat"&gt;&lt;div class="k"&gt;Letzte Bewegung&lt;/div&gt;&lt;div id="lastMotion" class="v"&gt;–&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="stat"&gt;&lt;div class="k"&gt;Erkannte Pixel&lt;/div&gt;&lt;div id="motionLevel" class="v"&gt;0&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="stat"&gt;&lt;div class="k"&gt;Clips&lt;/div&gt;&lt;div id="clipCount" class="v"&gt;0&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="stat"&gt;&lt;div class="k"&gt;Laufzeit&lt;/div&gt;&lt;div id="uptime" class="v"&gt;00:00:00&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/section&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;section class="card panel"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="btn-row" style="justify-content:space-between;align-items:center;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="pill"&gt;⚡ Telegram-Einstellungen&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button id="testTelegramBtn" class="ghost"&gt;Telegram testen&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="row2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="row"&gt;&lt;label&gt;Bot-Token&lt;/label&gt;&lt;input id="botToken" type="password" placeholder="123456:ABC-DEF…" autocomplete="off" /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="row"&gt;&lt;label&gt;Chat-ID&lt;/label&gt;&lt;input id="chatId" type="text" placeholder="z. B. 123456789" autocomplete="off" /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;Nachricht&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;textarea id="telegramMessage"&gt;🐱 Katze vermutlich am Trinken erkannt.&lt;/textarea&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="row2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;&lt;input id="sendPhoto" type="checkbox" checked /&gt; Snapshot mitsenden&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;&lt;input id="saveTelegramLocal" type="checkbox" checked /&gt; Einstellungen lokal speichern&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="telegramStatus" class="help"&gt;Bot-Token und Chat-ID eintragen. Erstelle einen Bot bei @BotFather in Telegram, dann sende /start an den Bot und nutze @userinfobot um deine Chat-ID zu erhalten.&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/section&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;section class="card clips"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="btn-row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button id="downloadAllBtn" class="ghost"&gt;Alle Clips herunterladen&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button id="clearClipsBtn" class="ghost"&gt;Clip-Liste leeren&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="clipList" class="clip-list"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/section&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;section class="card footer"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>Handy ans Ladegerät · Akku-Optimierung für Chrome deaktivieren · Bildschirm aktiv lassen.&lt;br&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>PWA installieren: Chrome-Menü → „Zum Startbildschirm hinzufügen". Für Service Worker muss die App über http(s) oder localhost geöffnet werden.</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/section&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;canvas id="work" class="hidden"&gt;&lt;/canvas&gt;</p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p1">const state = {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>stream:null, monitoring:false, motionLoop:0, recorder:null, recorderChunks:[],</p>
+<p class="p1"><span class="Apple-converted-space">  </span>isRecording:false, recordStopTimer:0, clipTimer:0, lastFrameData:null,</p>
+<p class="p1"><span class="Apple-converted-space">  </span>roi:null, roiEditMode:false, dragStart:null, startedAt:0,</p>
+<p class="p1"><span class="Apple-converted-space">  </span>lastTriggerAt:0, lastTelegramAt:0, clips:[], selectedDeviceId:null, installPrompt:null</p>
+<p class="p1">};</p>
+<p class="p1">const $=id=&gt;document.getElementById(id);</p>
+<p class="p1">const els={</p>
+<p class="p1"><span class="Apple-converted-space">  </span>video:$('video'),overlay:$('overlay'),viewer:$('viewer'),roiBox:$('roiBox'),work:$('work'),</p>
+<p class="p1"><span class="Apple-converted-space">  </span>camDot:$('camDot'),recDot:$('recDot'),camStatus:$('camStatus'),recStatus:$('recStatus'),pwaStatus:$('pwaStatus'),</p>
+<p class="p1"><span class="Apple-converted-space">  </span>cameraSelect:$('cameraSelect'),startBtn:$('startBtn'),monitorBtn:$('monitorBtn'),stopBtn:$('stopBtn'),</p>
+<p class="p1"><span class="Apple-converted-space">  </span>setRoiBtn:$('setRoiBtn'),clearRoiBtn:$('clearRoiBtn'),snapshotBtn:$('snapshotBtn'),installBtn:$('installBtn'),</p>
+<p class="p1"><span class="Apple-converted-space">  </span>sensitivity:$('sensitivity'),sensitivityValue:$('sensitivityValue'),motionPixels:$('motionPixels'),motionPixelsValue:$('motionPixelsValue'),</p>
+<p class="p1"><span class="Apple-converted-space">  </span>postRoll:$('postRoll'),clipLimit:$('clipLimit'),cooldown:$('cooldown'),telegramCooldown:$('telegramCooldown'),</p>
+<p class="p1"><span class="Apple-converted-space">  </span>lastMotion:$('lastMotion'),motionLevel:$('motionLevel'),clipCount:$('clipCount'),uptime:$('uptime'),</p>
+<p class="p1"><span class="Apple-converted-space">  </span>botToken:$('botToken'),chatId:$('chatId'),telegramMessage:$('telegramMessage'),sendPhoto:$('sendPhoto'),saveTelegramLocal:$('saveTelegramLocal'),</p>
+<p class="p1"><span class="Apple-converted-space">  </span>testTelegramBtn:$('testTelegramBtn'),telegramStatus:$('telegramStatus'),</p>
+<p class="p1"><span class="Apple-converted-space">  </span>clipList:$('clipList'),downloadAllBtn:$('downloadAllBtn'),clearClipsBtn:$('clearClipsBtn')</p>
+<p class="p1">};</p>
+<p class="p1">const octx=els.overlay.getContext('2d');</p>
+<p class="p1">const wctx=els.work.getContext('2d',{willReadFrequently:true});</p>
+<p class="p2"><br></p>
+<p class="p1">function toast(msg,ms=2800){const el=document.createElement('div');el.className='toast';el.textContent=msg;document.body.appendChild(el);setTimeout(()=&gt;el.remove(),ms);}</p>
+<p class="p1">function fmtClock(sec){sec=Math.max(0,Math.floor(sec));return[Math.floor(sec/3600),Math.floor((sec%3600)/60),sec%60].map(n=&gt;String(n).padStart(2,'0')).join(':');}</p>
+<p class="p1">function fmtDate(ts){return new Date(ts).toLocaleString('de-DE');}</p>
+<p class="p1">function roi(){return state.roi||{x:0.25,y:0.35,w:0.5,h:0.4};}</p>
+<p class="p2"><br></p>
+<p class="p1">function saveLocal(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(!els.saveTelegramLocal.checked)return;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>['botToken','chatId','telegramMessage','telegramCooldown','sensitivity','motionPixels'].forEach(k=&gt;localStorage.setItem('katze.'+k,els[k].value));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>localStorage.setItem('katze.sendPhoto',els.sendPhoto.checked?'1':'0');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>localStorage.setItem('katze.roi',JSON.stringify(state.roi||null));</p>
+<p class="p1">}</p>
+<p class="p1">function loadLocal(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>['botToken','chatId','telegramMessage','telegramCooldown','sensitivity','motionPixels'].forEach(k=&gt;{const v=localStorage.getItem('katze.'+k);if(v!==null)els[k].value=v;});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>els.sendPhoto.checked=(localStorage.getItem('katze.sendPhoto')||'1')==='1';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>try{state.roi=JSON.parse(localStorage.getItem('katze.roi')||'null');}catch(e){}</p>
+<p class="p1">}</p>
+<p class="p1">function syncLabels(){els.sensitivityValue.textContent=els.sensitivity.value;els.motionPixelsValue.textContent=els.motionPixels.value;saveLocal();}</p>
+<p class="p1">function updateBadges(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const on=!!state.stream;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>els.camDot.className='dot'+(on?' live':'');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>els.camStatus.textContent=on?'Kamera aktiv':'Kamera aus';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>els.recDot.className='dot'+(state.isRecording?' rec':'');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>els.recStatus.textContent=state.isRecording?'Aufnahme läuft':(state.monitoring?'Überwachung aktiv':'Nicht am Aufnehmen');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>els.clipCount.textContent=String(state.clips.length);</p>
+<p class="p1">}</p>
+<p class="p1">function renderRoiBox(tmp){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const r=tmp||state.roi;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(!r){els.roiBox.classList.add('hidden');return;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>els.roiBox.classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>Object.assign(els.roiBox.style,{left:`${r.x*100}%`,top:`${r.y*100}%`,width:`${r.w*100}%`,height:`${r.h*100}%`});</p>
+<p class="p1">}</p>
+<p class="p1">function drawOverlay(level=0,hit=false){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const v=els.video;if(!v.videoWidth)return;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>els.overlay.width=v.videoWidth;els.overlay.height=v.videoHeight;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const r=roi(),W=els.overlay.width,H=els.overlay.height;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const rx=r.x*W,ry=r.y*H,rw=r.w*W,rh=r.h*H;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>octx.clearRect(0,0,W,H);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>octx.fillStyle='rgba(15,23,42,0.25)';octx.fillRect(0,0,W,H);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>octx.clearRect(rx,ry,rw,rh);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>octx.strokeStyle=hit?'rgba(239,68,68,0.95)':'rgba(79,156,249,0.95)';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>octx.lineWidth=3;octx.setLineDash([10,8]);octx.strokeRect(rx,ry,rw,rh);octx.setLineDash([]);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>octx.fillStyle=hit?'rgba(239,68,68,0.90)':'rgba(79,156,249,0.90)';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>octx.fillRect(rx,Math.max(0,ry-32),230,28);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>octx.fillStyle='#fff';octx.font='bold 16px sans-serif';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>octx.fillText(`ROI | Pixel: ${level}`,rx+10,Math.max(20,ry-12));</p>
+<p class="p1">}</p>
+<p class="p1">function getPos(ev){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const rect=els.viewer.getBoundingClientRect();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const cx=ev.touches?ev.touches[0].clientX:ev.clientX;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const cy=ev.touches?ev.touches[0].clientY:ev.clientY;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return{x:Math.max(0,Math.min(rect.width,cx-rect.left)),y:Math.max(0,Math.min(rect.height,cy-rect.top)),width:rect.width,height:rect.height};</p>
+<p class="p1">}</p>
+<p class="p1">els.setRoiBtn.addEventListener('click',()=&gt;{if(!els.video.videoWidth)return toast('Starte zuerst die Kamera.');state.roiEditMode=true;toast('Ziehe das Rechteck über den Napf.');});</p>
+<p class="p1">['pointerdown','touchstart'].forEach(e=&gt;els.viewer.addEventListener(e,ev=&gt;{if(!state.roiEditMode)return;ev.preventDefault();state.dragStart=getPos(ev);},{passive:false}));</p>
+<p class="p1">['pointermove','touchmove'].forEach(e=&gt;els.viewer.addEventListener(e,ev=&gt;{if(!state.roiEditMode||!state.dragStart)return;ev.preventDefault();const p=getPos(ev);renderRoiBox({x:Math.min(state.dragStart.x,p.x)/p.width,y:Math.min(state.dragStart.y,p.y)/p.height,w:Math.abs(state.dragStart.x-p.x)/p.width,h:Math.abs(state.dragStart.y-p.y)/p.height});},{passive:false}));</p>
+<p class="p1">['pointerup','pointercancel','touchend'].forEach(e=&gt;els.viewer.addEventListener(e,ev=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(!state.roiEditMode||!state.dragStart)return;ev.preventDefault();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const p=getPos(ev);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const r={x:Math.min(state.dragStart.x,p.x)/p.width,y:Math.min(state.dragStart.y,p.y)/p.height,w:Math.abs(state.dragStart.x-p.x)/p.width,h:Math.abs(state.dragStart.y-p.y)/p.height};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.dragStart=null;state.roiEditMode=false;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(r.w&lt;0.05||r.h&lt;0.05)return toast('Bereich zu klein – bitte erneut setzen.');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.roi=r;renderRoiBox();drawOverlay();saveLocal();toast('Trinkbereich gespeichert.');</p>
+<p class="p1">},{passive:false}));</p>
+<p class="p2"><br></p>
+<p class="p1">async function listCameras(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>try{</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const devices=await navigator.mediaDevices.enumerateDevices();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const cams=devices.filter(d=&gt;d.kind==='videoinput');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>els.cameraSelect.innerHTML='';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>cams.forEach((cam,i)=&gt;{const o=document.createElement('option');o.value=cam.deviceId;o.textContent=cam.label||`Kamera ${i+1}`;els.cameraSelect.appendChild(o);});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if(!state.selectedDeviceId&amp;&amp;cams.length){const b=cams.find(x=&gt;/back|rear|environment/i.test(x.label));state.selectedDeviceId=(b||cams[0]).deviceId;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if(state.selectedDeviceId)els.cameraSelect.value=state.selectedDeviceId;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}catch(e){toast('Kameras konnten nicht gelesen werden.');}</p>
+<p class="p1">}</p>
+<p class="p1">async function startCamera(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(state.stream)state.stream.getTracks().forEach(t=&gt;t.stop());</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.stream=null;state.lastFrameData=null;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.selectedDeviceId=els.cameraSelect.value||state.selectedDeviceId;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const pref=state.selectedDeviceId?{audio:false,video:{deviceId:{exact:state.selectedDeviceId},width:{ideal:1280},height:{ideal:720}}}:{audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>try{state.stream=await navigator.mediaDevices.getUserMedia(pref);}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>catch(e){state.stream=await navigator.mediaDevices.getUserMedia({audio:false,video:true});}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>els.video.srcObject=state.stream;await els.video.play();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.startedAt=Date.now();updateBadges();await listCameras();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>els.monitorBtn.disabled=false;els.stopBtn.disabled=false;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>renderRoiBox();drawOverlay();toast('Kamera gestartet.');</p>
+<p class="p1">}</p>
+<p class="p1">function stopAll(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.monitoring=false;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(state.motionLoop)cancelAnimationFrame(state.motionLoop);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(state.recordStopTimer)clearTimeout(state.recordStopTimer);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(state.clipTimer)clearTimeout(state.clipTimer);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.motionLoop=state.recordStopTimer=state.clipTimer=0;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(state.isRecording&amp;&amp;state.recorder){try{state.recorder.stop();}catch(e){}}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.isRecording=false;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(state.stream)state.stream.getTracks().forEach(t=&gt;t.stop());</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.stream=null;state.lastFrameData=null;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>els.monitorBtn.disabled=true;els.stopBtn.disabled=true;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>updateBadges();drawOverlay(0,false);toast('Überwachung gestoppt.');</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function mimeType(){const t=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];return t.find(x=&gt;window.MediaRecorder&amp;&amp;MediaRecorder.isTypeSupported(x))||'';}</p>
+<p class="p1">function snapshotBlob(){return new Promise(res=&gt;{const c=document.createElement('canvas');c.width=els.video.videoWidth;c.height=els.video.videoHeight;c.getContext('2d').drawImage(els.video,0,0,c.width,c.height);c.toBlob(res,'image/jpeg',0.86);});}</p>
+<p class="p1">function snapshotDataUrl(){const c=document.createElement('canvas');c.width=els.video.videoWidth;c.height=els.video.videoHeight;c.getContext('2d').drawImage(els.video,0,0,c.width,c.height);return c.toDataURL('image/jpeg',0.82);}</p>
+<p class="p1">function dlBlob(blob,name){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=&gt;URL.revokeObjectURL(u),10000);}</p>
+<p class="p2"><br></p>
+<p class="p1">async function sendTelegram(isTest=false){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const token=els.botToken.value.trim(),chatId=els.chatId.value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(!token||!chatId){if(isTest)throw new Error('Token oder Chat-ID fehlt');els.telegramStatus.textContent='Telegram nicht konfiguriert.';return;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const coolMs=Number(els.telegramCooldown.value||10)*60000;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const now=Date.now();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(!isTest&amp;&amp;now-state.lastTelegramAt&lt;coolMs)return;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const text=`${els.telegramMessage.value.trim()||'🐱 Katze am Trinken erkannt.'}\n${new Date().toLocaleString('de-DE')}`;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(els.sendPhoto.checked){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const blob=await snapshotBlob();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const form=new FormData();form.append('chat_id',chatId);form.append('caption',text);form.append('photo',blob,'katze.jpg');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const res=await fetch(`https://api.telegram.org/bot${token}/sendPhoto`,{method:'POST',body:form});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const data=await res.json();if(!data.ok)throw new Error(data.description||'sendPhoto fehlgeschlagen');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}else{</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const res=await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:chatId,text})});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const data=await res.json();if(!data.ok)throw new Error(data.description||'sendMessage fehlgeschlagen');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.lastTelegramAt=now;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>els.telegramStatus.innerHTML='&lt;span class="ok"&gt;✓ Telegram gesendet.&lt;/span&gt;';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>saveLocal();toast(isTest?'Telegram-Test erfolgreich.':'Telegram-Alarm gesendet.');</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function addClip(blob,motion){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const clip={id:String(Date.now()+Math.random()),blob,name:`katze-trinkt-${new Date().toISOString().replace(/[:.]/g,'-')}.webm`,createdAt:Date.now(),motionPixels:motion,snapshot:snapshotDataUrl()};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.clips.unshift(clip);renderClips();updateBadges();</p>
+<p class="p1">}</p>
+<p class="p1">function renderClips(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>els.clipList.innerHTML='';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(!state.clips.length){const d=document.createElement('div');d.className='help';d.textContent='Noch keine Clips vorhanden.';els.clipList.appendChild(d);return;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.clips.forEach((clip,idx)=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const row=document.createElement('div');row.className='clip';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>row.innerHTML=`&lt;img src="${clip.snapshot}" alt="Clip"&gt;&lt;div&gt;&lt;h3&gt;Clip ${state.clips.length-idx} · ${fmtDate(clip.createdAt)}&lt;/h3&gt;&lt;p&gt;Pixel ${clip.motionPixels} · ${clip.name}&lt;/p&gt;&lt;/div&gt;&lt;div class="btn-row"&gt;&lt;button class="small primary" data-action="save" data-id="${clip.id}"&gt;Speichern&lt;/button&gt;&lt;button class="small ghost" data-action="play" data-id="${clip.id}"&gt;Abspielen&lt;/button&gt;&lt;/div&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>els.clipList.appendChild(row);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p1">}</p>
+<p class="p1">function scheduleStop(){if(state.recordStopTimer)clearTimeout(state.recordStopTimer);state.recordStopTimer=setTimeout(()=&gt;stopRecording('Nachlauf'),Number(els.postRoll.value||8)*1000);}</p>
+<p class="p1">function stopRecording(reason=''){if(!state.isRecording||!state.recorder)return;try{state.recorder.stop();}catch(e){}state.isRecording=false;updateBadges();if(reason)toast('Clip beendet: '+reason);}</p>
+<p class="p1">async function startRecording(motion){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(!state.stream)return;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const now=Date.now(),coolMs=Number(els.cooldown.value||12)*1000;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(state.isRecording){scheduleStop();return;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(now-state.lastTriggerAt&lt;coolMs)return;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.lastTriggerAt=now;state.recorderChunks=[];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const mt=mimeType();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.recorder=new MediaRecorder(state.stream,mt?{mimeType:mt}:undefined);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.isRecording=true;updateBadges();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.recorder.ondataavailable=ev=&gt;{if(ev.data&amp;&amp;ev.data.size&gt;0)state.recorderChunks.push(ev.data);};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.recorder.onstop=()=&gt;{const blob=new Blob(state.recorderChunks,{type:mt||'video/webm'});if(blob.size)addClip(blob,motion);state.recorder=null;state.recorderChunks=[];};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.recorder.start(1000);scheduleStop();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(state.clipTimer)clearTimeout(state.clipTimer);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.clipTimer=setTimeout(()=&gt;stopRecording('Max. Länge'),Number(els.clipLimit.value||25)*1000);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>try{await sendTelegram(false);}catch(e){els.telegramStatus.textContent='Telegram-Fehler: '+e.message;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>toast('Bewegung erkannt – Aufnahme gestartet.');</p>
+<p class="p1">}</p>
+<p class="p1">function detectMotion(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(!state.monitoring||!state.stream||!els.video.videoWidth)return;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const vw=els.video.videoWidth,vh=els.video.videoHeight;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const sW=320,sH=Math.round(vh*(sW/vw));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>els.work.width=sW;els.work.height=sH;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>wctx.drawImage(els.video,0,0,sW,sH);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const cur=wctx.getImageData(0,0,sW,sH);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>let level=0;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const r=roi(),x0=Math.max(0,Math.floor(r.x*sW)),y0=Math.max(0,Math.floor(r.y*sH)),x1=Math.min(sW,Math.floor((r.x+r.w)*sW)),y1=Math.min(sH,Math.floor((r.y+r.h)*sH));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const thresh=Number(els.sensitivity.value||18)*3;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(state.lastFrameData){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const a=cur.data,b=state.lastFrameData.data;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>for(let y=y0;y&lt;y1;y+=2)for(let x=x0;x&lt;x1;x+=2){const i=(y*sW+x)*4;if(Math.abs(a[i]-b[i])+Math.abs(a[i+1]-b[i+1])+Math.abs(a[i+2]-b[i+2])&gt;thresh)level++;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.lastFrameData=cur;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const scaled=level*4;const hit=scaled&gt;=Number(els.motionPixels.value||1400);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>els.motionLevel.textContent=String(scaled);drawOverlay(scaled,hit);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(hit){els.lastMotion.textContent=fmtDate(Date.now());startRecording(scaled);}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.motionLoop=requestAnimationFrame(detectMotion);</p>
+<p class="p1">}</p>
+<p class="p1">function startMonitoring(){if(!state.stream)return toast('Bitte zuerst die Kamera starten.');state.monitoring=true;state.lastFrameData=null;updateBadges();detectMotion();toast('Überwachung aktiv.');}</p>
+<p class="p2"><br></p>
+<p class="p1">async function registerPWA(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if('serviceWorker' in navigator){try{await navigator.serviceWorker.register('./sw.js');els.pwaStatus.textContent='PWA: Service Worker aktiv';}catch(e){els.pwaStatus.textContent='PWA: SW fehlgeschlagen';}}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>else els.pwaStatus.textContent='PWA: kein SW-Support';</p>
+<p class="p1">}</p>
+<p class="p1">window.addEventListener('beforeinstallprompt',e=&gt;{e.preventDefault();state.installPrompt=e;els.installBtn.classList.remove('hidden');els.pwaStatus.textContent='PWA: installierbar';});</p>
+<p class="p1">els.installBtn.addEventListener('click',async()=&gt;{if(!state.installPrompt)return toast('Installieren: Chrome-Menü → Zum Startbildschirm.');state.installPrompt.prompt();await state.installPrompt.userChoice;state.installPrompt=null;els.installBtn.classList.add('hidden');});</p>
+<p class="p2"><br></p>
+<p class="p1">setInterval(()=&gt;{if(state.startedAt)els.uptime.textContent=fmtClock((Date.now()-state.startedAt)/1000);},1000);</p>
+<p class="p1">els.startBtn.addEventListener('click',startCamera);</p>
+<p class="p1">els.monitorBtn.addEventListener('click',startMonitoring);</p>
+<p class="p1">els.stopBtn.addEventListener('click',stopAll);</p>
+<p class="p1">els.clearRoiBtn.addEventListener('click',()=&gt;{state.roi=null;renderRoiBox();drawOverlay();saveLocal();toast('Bereich zurückgesetzt.');});</p>
+<p class="p1">els.snapshotBtn.addEventListener('click',()=&gt;{if(!els.video.videoWidth)return toast('Kamera nicht bereit.');fetch(snapshotDataUrl()).then(r=&gt;r.blob()).then(b=&gt;dlBlob(b,`napf-${Date.now()}.jpg`));});</p>
+<p class="p1">els.testTelegramBtn.addEventListener('click',async()=&gt;{try{await sendTelegram(true);}catch(e){els.telegramStatus.textContent='Fehler: '+e.message;toast('Telegram-Test fehlgeschlagen.');}});</p>
+<p class="p1">els.downloadAllBtn.addEventListener('click',()=&gt;{if(!state.clips.length)return toast('Keine Clips.');state.clips.forEach((c,i)=&gt;setTimeout(()=&gt;dlBlob(c.blob,c.name),i*500));toast('Downloads gestartet.');});</p>
+<p class="p1">els.clearClipsBtn.addEventListener('click',()=&gt;{state.clips=[];renderClips();updateBadges();});</p>
+<p class="p1">els.clipList.addEventListener('click',ev=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const btn=ev.target.closest('button[data-id]');if(!btn)return;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const clip=state.clips.find(c=&gt;c.id===btn.dataset.id);if(!clip)return;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(btn.dataset.action==='save')dlBlob(clip.blob,clip.name);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(btn.dataset.action==='play'){const u=URL.createObjectURL(clip.blob);const w=window.open('','_blank');if(w)w.document.write(`&lt;video controls autoplay style="width:100%;background:#000" src="${u}"&gt;&lt;/video&gt;`);else toast('Popup blockiert.');}</p>
+<p class="p1">});</p>
+<p class="p1">els.cameraSelect.addEventListener('change',()=&gt;state.selectedDeviceId=els.cameraSelect.value);</p>
+<p class="p1">[els.sensitivity,els.motionPixels].forEach(el=&gt;el.addEventListener('input',syncLabels));</p>
+<p class="p1">[els.botToken,els.chatId,els.telegramMessage,els.sendPhoto,els.saveTelegramLocal,els.telegramCooldown].forEach(el=&gt;el.addEventListener('change',saveLocal));</p>
+<p class="p1">navigator.mediaDevices?.addEventListener?.('devicechange',listCameras);</p>
+<p class="p1">window.addEventListener('beforeunload',stopAll);</p>
+<p class="p2"><br></p>
+<p class="p1">loadLocal();syncLabels();renderClips();updateBadges();renderRoiBox();listCameras();registerPWA();</p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
